@@ -1,5 +1,6 @@
 package com.eldoria.cronicas;
 import android.app.Activity;
+import android.content.pm.ApplicationInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -19,6 +20,9 @@ public class MainActivity extends Activity {
     getWindow().getDecorView().setSystemUiVisibility(
         View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
             | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    if ((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0) {
+      WebView.setWebContentsDebuggingEnabled(true);
+    }
     game = new WebView(this);
     game.setBackgroundColor(0xff0d1018);
     WebSettings settings = game.getSettings();

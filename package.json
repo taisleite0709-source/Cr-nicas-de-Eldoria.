@@ -1,0 +1,11 @@
+{
+  "name": "cronicas-de-eldoria",
+  "version": "15.3.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

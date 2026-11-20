@@ -1,0 +1,6 @@
+plugins { id 'com.android.application' }
+android { namespace 'com.eldoria.cronicas'; compileSdk 35; buildToolsVersion "35.0.0"
+    defaultConfig { applicationId 'com.eldoria.cronicas'; minSdk 24; targetSdk 28; versionCode 153; versionName '15.3' }
+    buildTypes { release { minifyEnabled false } }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+}

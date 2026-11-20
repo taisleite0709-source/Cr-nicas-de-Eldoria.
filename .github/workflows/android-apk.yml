@@ -2,23 +2,46 @@ name: Gerar APK Android
 on:
   workflow_dispatch:
   push:
-    branches: [main]
+    branches: [main, master, eldoria-v15.3]
 jobs:
   apk:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: node syntax-check.js && npm test
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
       - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.10.2'
-      - name: Compilar APK de teste
-        run: gradle --no-daemon assembleDebug
+      - name: Compilar e verificar APK
+        run: |
+          gradle --no-daemon assembleDebug
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose app/build/outputs/apk/debug/app-debug.apk
+          mv app/build/outputs/apk/debug/app-debug.apk Cronicas-de-Eldoria-v15.3-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Cronicas-de-Eldoria-v79-APK
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: Cronicas-de-Eldoria-v15.3-APK
+          path: Cronicas-de-Eldoria-v15.3-debug.apk
+      - name: Permitir aceleração do emulador
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Teste de instalação e interface no Android 15
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: default
+          arch: x86_64
+          disable-animations: true
+          script: bash tests/android-emulator-smoke.sh Cronicas-de-Eldoria-v15.3-debug.apk
